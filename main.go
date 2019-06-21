@@ -1,19 +1,23 @@
 package main
 
 import (
+	"fmt"
 	"github.com/husobee/vestigo"
 	"net/http"
 )
 
 func main() {
 	router := vestigo.NewRouter()
+	router.Get("/*", http.FileServer(http.Dir("web/build")).ServeHTTP)
 
-	router.Get("/*", http.FileServer(http.Dir("static")).ServeHTTP)
+	vestigo.CustomNotFoundHandlerFunc(customHandler)
 
 	http.ListenAndServe(":1234", router)
 }
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	name := vestigo.Param(r, "name")
-	w.Write([]byte("Hey " + name))
+func customHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("customHandler")
+	w.WriteHeader(http.StatusNotFound)
+	w.Write([]byte("cccccccccccccccccustom not found"))
+
 }
